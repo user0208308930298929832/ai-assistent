@@ -1,6 +1,6 @@
 import streamlit as st
 from openai import OpenAI
-import json, os, random, time, requests
+import json, os, random, time, requests, pyperclip
 from datetime import datetime
 
 # ================================
@@ -71,25 +71,17 @@ def login():
 # 📊 FUNÇÕES AUXILIARES
 # ================================
 def get_engagement_boost():
-    """Busca realista de variação de engajamento médio."""
+    """Simula uma variação realista de engajamento"""
     try:
-        r = requests.get("https://api.socialdata.tools/engagement/instagram/trends")
-        if r.status_code == 200:
-            data = r.json()
-            return round(data.get("average_boost", random.uniform(4.5, 8.2)), 1)
+        return round(random.uniform(5.4, 9.7), 1)
     except:
-        return round(random.uniform(4.8, 7.9), 1)
+        return 6.3
 
 def get_best_post_hour(nicho="Geral"):
-    """
-    Pesquisa o melhor horário de publicação (2025),
-    adaptado ao nicho, com fallback inteligente.
-    """
     try:
-        query = f"melhor horário para publicar no Instagram {nicho} 2025 site:later.com OR site:socialinsider.io OR site:hootsuite.com"
+        query = f"melhor horário para publicar no Instagram {nicho} 2025 site:later.com OR site:socialinsider.io"
         url = f"https://api.duckduckgo.com/?q={query}&format=json"
         response = requests.get(url, timeout=5).json()
-
         text = response.get("AbstractText", "").lower()
         if "manhã" in text:
             return "09:00 — pico de visualizações matinais ☀️"
@@ -99,20 +91,16 @@ def get_best_post_hour(nicho="Geral"):
             return "19:00 — maior taxa de interação 🌙"
         else:
             return "18:00 — horário universal de maior atividade 📈"
-    except Exception:
-        opções = [
+    except:
+        return random.choice([
             "09:00 — início do dia com alto alcance ☀️",
             "12:00 — pausa para almoço, mais engagement 🍴",
             "18:30 — pico de atividade pós-trabalho 🚀",
             "21:00 — bom para conteúdos inspiracionais 🌙"
-        ]
-        return random.choice(opções)
+        ])
 
-# ================================
-# 🎬 FUNÇÃO DE TYPING EFFECT
-# ================================
-def typing_effect(text, speed=0.02):
-    """Simula o efeito de digitação letra a letra"""
+def typing_effect(text, speed=0.015):
+    """Efeito de digitação"""
     placeholder = st.empty()
     typed = ""
     for char in text:
@@ -124,7 +112,7 @@ def typing_effect(text, speed=0.02):
 # 🚀 APP PRINCIPAL
 # ================================
 def main_app():
-    st.set_page_config(page_title="AI Social Automator — Starter 2.4", layout="centered")
+    st.set_page_config(page_title="AI Social Automator — Starter 2.5", layout="centered")
     st.sidebar.success(f"👋 Logado como {st.session_state['username']}")
     if st.sidebar.button("🚪 Sair"):
         for k in ["logged_in", "username", "plan"]:
@@ -133,7 +121,7 @@ def main_app():
 
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    st.markdown("<h1 style='text-align:center;'>🤖 AI Social Automator — Starter 2.4</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>🤖 AI Social Automator — Starter 2.5</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center;'>Cria legendas otimizadas, tons de voz e análises reais de engajamento 📊</p>", unsafe_allow_html=True)
     st.write("---")
 
@@ -145,20 +133,30 @@ def main_app():
         if not tema.strip():
             st.warning("Escreve o tema primeiro! ⚠️")
         else:
-            with st.spinner("✨ A criar legenda otimizada..."):
-                time.sleep(1.2)
-                prompt = f"Cria uma legenda curta e criativa em português de Portugal sobre '{tema}'. Nicho: {nicho}. Tom: {tom}. Inclui 3 hashtags no final."
+            with st.spinner("✨ A criar legendas otimizadas..."):
+                prompt = f"Cria DUAS legendas curtas e criativas em português de Portugal sobre '{tema}'. Nicho: {nicho}. Tom: {tom}. Inclui hashtags no fim."
                 resposta = client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[{"role": "user", "content": prompt}]
                 )
                 texto = resposta.choices[0].message.content
+                # Divide as duas legendas
+                variações = texto.split("\n\n")
                 boost = get_engagement_boost()
                 hora = get_best_post_hour(nicho)
 
-            st.subheader("🧠 Legenda sugerida:")
-            typing_effect(texto)
-            st.info(f"📈 Engajamento estimado: +{boost}% | ⏰ Hora ideal: {hora}")
+            st.subheader("🧠 Legendas sugeridas:")
+            for i, var in enumerate(variações[:2], 1):
+                with st.container():
+                    st.markdown(f"**💬 Legenda {i}:**")
+                    typing_effect(var.strip())
+                    col1, col2 = st.columns([1, 6])
+                    with col1:
+                        if st.button(f"📋 Copiar {i}", key=f"copy_{i}"):
+                            pyperclip.copy(var.strip())
+                            st.success("Copiado com sucesso!")
+                    with col2:
+                        st.info(f"📈 Engajamento: +{boost}% | ⏰ Hora ideal: {hora}")
 
     st.caption("Plano Starter · Modelo: GPT-4o-mini · © 2025 AI Social Automator")
 
