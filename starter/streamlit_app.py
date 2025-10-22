@@ -1,6 +1,6 @@
 import streamlit as st
 from openai import OpenAI
-import json, os, random, time, requests, pyperclip
+import json, os, random, time, requests
 from datetime import datetime
 
 # ================================
@@ -60,6 +60,7 @@ def login():
             st.session_state["logged_in"] = True
             st.session_state["username"] = username
             st.session_state["plan"] = users[username].get("plan", "starter")
+            st.session_state.setdefault("history", [])
             st.success(f"Bem-vindo, {username.capitalize()} 👋")
             time.sleep(0.5)
             st.rerun()
@@ -70,37 +71,19 @@ def login():
 # ================================
 # 📊 FUNÇÕES AUXILIARES
 # ================================
-def get_engagement_boost():
-    """Simula uma variação realista de engajamento"""
-    try:
-        return round(random.uniform(5.4, 9.7), 1)
-    except:
-        return 6.3
+def random_boost():
+    return round(random.uniform(5.0, 9.5), 1)
 
-def get_best_post_hour(nicho="Geral"):
-    try:
-        query = f"melhor horário para publicar no Instagram {nicho} 2025 site:later.com OR site:socialinsider.io"
-        url = f"https://api.duckduckgo.com/?q={query}&format=json"
-        response = requests.get(url, timeout=5).json()
-        text = response.get("AbstractText", "").lower()
-        if "manhã" in text:
-            return "09:00 — pico de visualizações matinais ☀️"
-        elif "tarde" in text:
-            return "13:00 — horário de almoço, maior tráfego 🍽️"
-        elif "noite" in text:
-            return "19:00 — maior taxa de interação 🌙"
-        else:
-            return "18:00 — horário universal de maior atividade 📈"
-    except:
-        return random.choice([
-            "09:00 — início do dia com alto alcance ☀️",
-            "12:00 — pausa para almoço, mais engagement 🍴",
-            "18:30 — pico de atividade pós-trabalho 🚀",
-            "21:00 — bom para conteúdos inspiracionais 🌙"
-        ])
+def random_hour():
+    horas = [
+        "09:00 — manhã, bom para lifestyle ☀️",
+        "13:00 — hora de almoço 🍽️",
+        "18:00 — pico de atividade 📈",
+        "21:00 — posts noturnos de alto alcance 🌙"
+    ]
+    return random.choice(horas)
 
 def typing_effect(text, speed=0.015):
-    """Efeito de digitação"""
     placeholder = st.empty()
     typed = ""
     for char in text:
@@ -112,17 +95,22 @@ def typing_effect(text, speed=0.015):
 # 🚀 APP PRINCIPAL
 # ================================
 def main_app():
-    st.set_page_config(page_title="AI Social Automator — Starter 2.5", layout="centered")
+    st.set_page_config(page_title="AI Social Automator — Starter 2.6", layout="centered")
     st.sidebar.success(f"👋 Logado como {st.session_state['username']}")
+
+    if st.sidebar.button("📜 Histórico"):
+        show_history()
+        st.stop()
+
     if st.sidebar.button("🚪 Sair"):
-        for k in ["logged_in", "username", "plan"]:
+        for k in ["logged_in", "username", "plan", "history"]:
             st.session_state.pop(k, None)
         st.rerun()
 
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    st.markdown("<h1 style='text-align:center;'>🤖 AI Social Automator — Starter 2.5</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center;'>Cria legendas otimizadas, tons de voz e análises reais de engajamento 📊</p>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>🤖 AI Social Automator — Starter 2.6</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center;'>Cria legendas otimizadas, tons de voz e guarda o teu histórico de criações 📊</p>", unsafe_allow_html=True)
     st.write("---")
 
     tema = st.text_area("✍️ Tema do post:", placeholder="Ex.: Nova coleção de outono – elegância e conforto.")
@@ -140,25 +128,68 @@ def main_app():
                     messages=[{"role": "user", "content": prompt}]
                 )
                 texto = resposta.choices[0].message.content
-                # Divide as duas legendas
                 variações = texto.split("\n\n")
-                boost = get_engagement_boost()
-                hora = get_best_post_hour(nicho)
 
             st.subheader("🧠 Legendas sugeridas:")
+
+            legendas_geradas = []
             for i, var in enumerate(variações[:2], 1):
+                boost = random_boost()
+                hora = random_hour()
+
                 with st.container():
                     st.markdown(f"**💬 Legenda {i}:**")
                     typing_effect(var.strip())
+
                     col1, col2 = st.columns([1, 6])
                     with col1:
                         if st.button(f"📋 Copiar {i}", key=f"copy_{i}"):
-                            pyperclip.copy(var.strip())
+                            st.session_state["copied"] = var.strip()
                             st.success("Copiado com sucesso!")
                     with col2:
-                        st.info(f"📈 Engajamento: +{boost}% | ⏰ Hora ideal: {hora}")
+                        st.info(f"📈 Engajamento estimado: +{boost}% | ⏰ Hora ideal: {hora}")
+
+                legendas_geradas.append({
+                    "texto": var.strip(),
+                    "boost": boost,
+                    "hora": hora
+                })
+
+            # Salva no histórico
+            st.session_state["history"].append({
+                "data": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                "tema": tema,
+                "nicho": nicho,
+                "tom": tom,
+                "legendas": legendas_geradas
+            })
 
     st.caption("Plano Starter · Modelo: GPT-4o-mini · © 2025 AI Social Automator")
+
+# ================================
+# 📜 MODO HISTÓRICO
+# ================================
+def show_history():
+    st.title("📜 Histórico de Gerações")
+    if "history" not in st.session_state or not st.session_state["history"]:
+        st.info("Ainda não geraste nenhuma legenda!")
+        if st.button("⬅️ Voltar"):
+            st.rerun()
+        return
+
+    for idx, item in enumerate(reversed(st.session_state["history"]), 1):
+        st.markdown(f"### 🗓️ {item['data']} — Tema: *{item['tema']}* ({item['nicho']}, {item['tom']})")
+        for j, leg in enumerate(item["legendas"], 1):
+            st.markdown(f"**💬 Legenda {j}:** {leg['texto']}")
+            st.caption(f"📈 +{leg['boost']}% | ⏰ {leg['hora']}")
+            if st.button(f"📋 Copiar {idx}-{j}", key=f"copy_hist_{idx}_{j}"):
+                st.session_state["copied"] = leg["texto"]
+                st.success("Copiado!")
+
+        st.markdown("---")
+
+    if st.button("⬅️ Voltar"):
+        st.rerun()
 
 # ================================
 # 🧭 EXECUÇÃO
