@@ -13,10 +13,66 @@ def load_users():
         return json.load(f)
 
 def login():
-    st.sidebar.title("🔐 Login")
-    username = st.sidebar.text_input("Utilizador")
-    password = st.sidebar.text_input("Palavra-passe", type="password")
-    users = load_users()
+    import os
+    import json
+
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background: linear-gradient(135deg, #1c1c1c 0%, #2c2c2c 100%);
+        }
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 90vh;
+        }
+        .login-box {
+            background: #fff;
+            padding: 3rem 4rem;
+            border-radius: 20px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            color: #333;
+        }
+        .login-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #ff7b00;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # --- Load users
+    path = os.path.join(os.path.dirname(__file__), "users.json")
+    with open(path, "r") as f:
+        users = json.load(f)
+
+    # --- Central login box
+    st.markdown('<div class="login-container"><div class="login-box">', unsafe_allow_html=True)
+    st.markdown('<div class="login-title">🔐 Login</div>', unsafe_allow_html=True)
+
+    username = st.text_input("👤 Utilizador")
+    password = st.text_input("🔑 Palavra-passe", type="password")
+
+    if st.button("Entrar", use_container_width=True):
+        if username in users and users[username]["password"] == password:
+            st.session_state["logged_in"] = True
+            st.session_state["username"] = username
+            st.session_state["plan"] = users[username].get("plan", "starter")
+            st.success(f"Bem-vindo, {username.capitalize()} 👋")
+            st.rerun()
+        else:
+            st.error("Utilizador ou palavra-passe incorretos ❌")
+
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
     if st.sidebar.button("Entrar"):
         if username in users and users[username]["password"] == password:
