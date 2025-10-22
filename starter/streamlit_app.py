@@ -78,7 +78,7 @@ if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
 # ================================================================
 
 logout()
-st.title("🤖 AI Social Automator — Starter 2.0")
+st.title("🤖 AI Social Automator — Starter 2.1")
 st.caption("Cria legendas otimizadas, tons de voz e análises reais de engajamento 🚀")
 
 api_key = os.getenv("OPENAI_API_KEY")
