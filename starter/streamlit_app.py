@@ -7,7 +7,9 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def load_users():
-    with open("users.json", "r") as f:
+    import os
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
+    with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 def login():
