@@ -1,0 +1,4 @@
+{
+  "miguel": {"password": "12345", "plan": "pro"},
+  "ana": {"password": "abcde", "plan": "starter"}
+}

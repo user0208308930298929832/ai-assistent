@@ -1,4 +1,45 @@
 import streamlit as st
+import json
+import hashlib
+
+# --- Funções de apoio ---
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def load_users():
+    with open("users.json", "r") as f:
+        return json.load(f)
+
+def login():
+    st.sidebar.title("🔐 Login")
+    username = st.sidebar.text_input("Utilizador")
+    password = st.sidebar.text_input("Palavra-passe", type="password")
+    users = load_users()
+
+    if st.sidebar.button("Entrar"):
+        if username in users and users[username]["password"] == password:
+            st.session_state["logged_in"] = True
+            st.session_state["username"] = username
+            st.session_state["plan"] = users[username]["plan"]
+            st.sidebar.success(f"Bem-vindo, {username}!")
+            st.rerun()
+        else:
+            st.sidebar.error("❌ Credenciais incorretas.")
+
+def logout():
+    if st.sidebar.button("🚪 Sair"):
+        for key in ["logged_in", "username", "plan"]:
+            if key in st.session_state:
+                del st.session_state[key]
+        st.rerun()
+
+# --- Verificação de login ---
+if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
+    login()
+    st.stop()
+else:
+    logout()
+import streamlit as st
 from openai import OpenAI
 import os
 
