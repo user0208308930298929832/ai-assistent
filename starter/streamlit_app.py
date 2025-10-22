@@ -2,9 +2,9 @@ import streamlit as st
 from openai import OpenAI
 import json, os, random, time
 
-# ================================================================
+# ===============================================================
 # 🧱 FUNÇÕES AUXILIARES
-# ================================================================
+# ===============================================================
 
 def load_users():
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
