@@ -1,0 +1,15 @@
+[theme]
+base = "light"                      # Usa modo claro (tema branco clean)
+primaryColor = "#007BFF"            # Azul moderno
+backgroundColor = "#FFFFFF"         # Fundo branco puro
+secondaryBackgroundColor = "#F4F6F8" # Cartões e inputs com cinza suave
+textColor = "#1C1C1E"               # Texto em preto acinzentado
+font = "Inter"                      # Fonte moderna e limpa
+
+[server]
+enableCORS = false
+headless = true
+port = 8501
+
+[browser]
+gatherUsageStats = false
