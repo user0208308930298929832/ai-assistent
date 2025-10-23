@@ -6,7 +6,7 @@ from pathlib import Path
 BASE = Path(__file__).resolve().parent.parent
 DATA = BASE / "history"
 DATA.mkdir(exist_ok=True)
-USERS_PATH = BASE / "users.json"
+USERS_PATH = Path(__file__).resolve().parent.parent / "starter" / "users.json"
 
 
 # ===================== Estilo global (tema branco clean) =====================
