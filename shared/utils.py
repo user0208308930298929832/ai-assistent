@@ -10,7 +10,7 @@ BASE = Path(__file__).resolve().parent.parent
 DATA = BASE / "history"
 DATA.mkdir(exist_ok=True)
 
-USERS_PATH = BASE / "users.json"
+USERS_PATH = os.path.join(BASE, "starter", "users.json")
 
 # ---------- Estilo global (branco clean)
 def inject_css():
