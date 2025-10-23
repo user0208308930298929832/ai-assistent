@@ -158,35 +158,43 @@ def login_screen():
 
     st.markdown("""
     <style>
+    /* === Layout geral === */
     .login-box {
         background: rgba(255,255,255,0.04);
         border: 1px solid rgba(120,190,255,0.25);
         border-radius: 16px;
-        padding: 32px 38px;
+        padding: 28px 32px;
         width: 100%;
-        max-width: 360px;
-        margin: 120px auto;
+        max-width: 300px;
+        margin: 22vh auto 0 auto;
         text-align: center;
-        box-shadow: 0 6px 20px rgba(0, 100, 255, 0.12);
+        box-shadow: 0 6px 18px rgba(0, 100, 255, 0.12);
         backdrop-filter: blur(10px);
     }
+
+    /* === Título e subtítulo === */
     .login-title {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
         font-weight: 800;
         color: #38b6ff;
         text-shadow: 0 0 10px rgba(0,180,255,0.4);
-        margin-bottom: 4px;
+        margin-bottom: 6px;
+        text-align: center;
     }
     .login-sub {
         color: #b9d6f2;
-        margin-bottom: 22px;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        text-align: center;
     }
+
+    /* === Inputs === */
     .stTextInput label {
         font-weight: 600;
         color: #9bd2ff !important;
-        font-size: 0.85rem !important;
-        text-align: left;
+        font-size: 0.8rem !important;
+        text-align: center;
+        display: block;
         margin-bottom: 4px;
     }
     div[data-baseweb="input"] > div {
@@ -194,32 +202,35 @@ def login_screen():
         border-radius: 10px !important;
         background: rgba(10,20,30,0.65) !important;
         transition: all 0.25s ease;
-        height: 36px !important;
+        height: 34px !important;
     }
     div[data-baseweb="input"]:focus-within > div {
         border: 1px solid #38b6ff !important;
-        box-shadow: 0 0 8px rgba(56,182,255,0.35) !important;
+        box-shadow: 0 0 10px rgba(56,182,255,0.45) !important;
         background: rgba(10,25,40,0.85) !important;
     }
     input {
         color: #e8f4ff !important;
         font-size: 0.9rem !important;
+        text-align: center !important;
     }
+
+    /* === Botão === */
     .stButton > button {
         background: linear-gradient(90deg,#0078ff,#00bfff);
         color: white;
         font-weight: 700;
-        border-radius: 10px;
+        border-radius: 20px;
         border: none;
-        padding: 4px 0;
+        padding: 5px 0;
         width: 100%;
-        margin-top: 10px;
-        height: 36px;
-        box-shadow: 0 0 10px rgba(0,150,255,0.3);
+        margin-top: 12px;
+        height: 34px;
+        box-shadow: 0 0 12px rgba(0,150,255,0.35);
         transition: all 0.25s ease;
     }
     .stButton > button:hover {
-        box-shadow: 0 0 18px rgba(0,180,255,0.45);
+        box-shadow: 0 0 20px rgba(0,180,255,0.5);
         transform: translateY(-1px);
     }
     </style>
@@ -231,8 +242,8 @@ def login_screen():
     st.markdown('<div class="login-sub">Acede à tua conta para começar 🚀</div>', unsafe_allow_html=True)
 
     with st.form("login_form", clear_on_submit=False):
-        u = st.text_input("👤 Utilizador", placeholder="Insere o teu utilizador")
-        p = st.text_input("🔑 Palavra-passe", type="password", placeholder="Insere a tua palavra-passe")
+        u = st.text_input("👤 Utilizador", placeholder="Utilizador")
+        p = st.text_input("🔑 Palavra-passe", type="password", placeholder="Palavra-passe")
         ok = st.form_submit_button("Entrar")
 
         if ok:
