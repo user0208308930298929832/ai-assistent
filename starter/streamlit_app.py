@@ -4,9 +4,10 @@ from openai import OpenAI
 import os, json, time, random, base64, uuid
 from datetime import datetime
 from pathlib import Path
+from string import Template
 
 # -------------------- CONFIG --------------------
-st.set_page_config(page_title="AI Social Automator — Starter 3.0", page_icon="🤖", layout="centered")
+st.set_page_config(page_title="AI Social Automator — Starter 3.1", page_icon="🤖", layout="centered")
 APP_TITLE = "AI Social Automator"
 BASE = Path(__file__).parent
 ASSETS = BASE / "assets"
@@ -23,20 +24,46 @@ st.markdown("""
 <style>
 .stApp { background: radial-gradient(1200px 600px at 50% -10%, #0e1a22 0%, #0a1016 45%, #060b10 100%); color:#e8f4ff; font-family: Inter, system-ui; }
 .block-container { max-width: 900px; }
-.glass { background: rgba(180,230,255,.06); border:1px solid rgba(160,220,255,.18);
-         border-radius:18px; box-shadow:0 12px 35px rgba(0,0,0,.35); backdrop-filter: blur(12px); }
-.glass.card { margin: 12px 0; transition: all .25s ease; }
-.glass.card:hover { box-shadow: 0 16px 40px rgba(0, 180, 255, .12); transform: translateY(-2px); }
-.h1 { text-align:center; font-weight:800; font-size:clamp(26px,4vw,44px); color:#9be3ff; text-shadow:0 0 18px rgba(90,200,255,.25); margin:6px 0 8px; }
-.subtle { text-align:center; color:#b9d5e6; margin-top:-6px; }
-.badge { display:inline-flex; gap:.5rem; padding:8px 12px; border-radius:12px; font-weight:700;
-         background:rgba(150,220,255,.12); border:1px solid rgba(160,220,255,.22); }
+.glass-card {
+  background: rgba(180, 230, 255, 0.05);
+  border: 1px solid rgba(160, 220, 255, 0.18);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-top: 14px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  transition: all 0.25s ease;
+}
+.glass-card:hover {
+  background: rgba(180, 230, 255, 0.07);
+  box-shadow: 0 10px 35px rgba(0, 180, 255, 0.15);
+  transform: translateY(-2px);
+}
+.copy-btn {
+  background: linear-gradient(90deg,#1ebfff,#009cff);
+  color: #00131a;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(30,191,255,.35);
+}
+.badge {
+  display: inline-flex;
+  gap: .5rem;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  background: rgba(150,220,255,.12);
+  border: 1px solid rgba(160,220,255,.22);
+  color: #e3f8ff;
+  margin-right: 6px;
+}
 .robots { display:flex; justify-content:center; gap:28px; margin:10px 0 8px; }
 .robots img { filter: drop-shadow(0 10px 30px rgba(0,200,255,.25)); }
 .robot-sit { transform: translateY(6px) scale(.96); }
 .robot-mid { transform: translateY(-3px) scale(1.05); }
-.copy-btn { background: linear-gradient(90deg,#1ebfff,#009cff); color:#00131a; border:none; border-radius:10px;
-            padding:8px 16px; font-weight:700; cursor:pointer; box-shadow:0 0 10px rgba(30,191,255,.35); }
 hr { border: 1px solid rgba(160,220,255,0.15); }
 </style>
 """, unsafe_allow_html=True)
@@ -68,42 +95,46 @@ def save_history(username:str, record:dict):
     with open(hpath(username),"w",encoding="utf-8") as f:
         json.dump(data,f,ensure_ascii=False,indent=2)
 
-# ---------- BOTÃO COPIAR (NOVA VERSÃO) ----------
+# ---------- BOTÃO COPIAR (CORRIGIDO E TESTADO) ----------
 def js_copy_button(label: str, text: str, key: str | None = None):
-    """Botão de copiar robusto (Base64 → Clipboard via JS, compatível com emojis)."""
+    """Botão de copiar robusto com suporte a emojis e Base64."""
     if key is None:
         key = f"copy_{uuid.uuid4().hex}"
 
     b64 = base64.b64encode(text.encode("utf-8")).decode("ascii")
 
-    html = """
+    tpl = Template(r"""
     <div style="display:inline-flex;align-items:center;gap:10px;">
-      <button id="{key}" class="copy-btn">{label}</button>
+      <button id="$KEY" class="copy-btn">$LABEL</button>
       <script>
-        (function(){{
-          const btn = document.getElementById("{key}");
-          if(!btn) return;
-          function b64ToUtf8(b64){{
-            const bin = atob(b64);
-            const bytes = new Uint8Array(bin.length);
+        (function(){
+          const btn=document.getElementById("$KEY");
+          if(!btn)return;
+          function b64ToUtf8(b64){
+            const bin=atob(b64);
+            const bytes=new Uint8Array(bin.length);
             for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
             return new TextDecoder().decode(bytes);
-          }}
-          const payload="{b64}";
-          btn.addEventListener("click", async()=>{
-            try{{
+          }
+          const payload="$B64";
+          btn.addEventListener("click",async()=>{
+            try{
               const txt=b64ToUtf8(payload);
               await navigator.clipboard.writeText(txt);
               const old=btn.innerText;
               btn.innerText="Copiado ✅";
               setTimeout(()=>btn.innerText=old,1200);
-            }}catch(e){{alert("Não foi possível copiar.");}}
-          }});
-        }})();
+            }catch(e){
+              const old=btn.innerText;
+              btn.innerText="Erro 😕";
+              setTimeout(()=>btn.innerText=old,1200);
+            }
+          });
+        })();
       </script>
     </div>
-    """.format(key=key, label=label, b64=b64)
-
+    """)
+    html = tpl.substitute(KEY=key, LABEL=label, B64=b64)
     components.html(html, height=60, scrolling=False)
 
 def dynamic_stats(seed=None):
@@ -126,11 +157,7 @@ def gen_two_captions(theme, niche, tone):
         temperature=0.7, max_tokens=240
     )
     txt = r.choices[0].message.content.strip()
-    parts = []
-    for ln in txt.splitlines():
-        s = ln.strip()
-        if s[:2] in ("1)", "2)"):
-            parts.append(s[2:].strip(": ").strip())
+    parts = [ln[2:].strip(": ").strip() for ln in txt.splitlines() if ln[:2] in ("1)", "2)")]
     if len(parts)<2:
         half = len(txt)//2
         parts = [txt[:half].strip(), txt[half:].strip()]
@@ -139,38 +166,34 @@ def gen_two_captions(theme, niche, tone):
 # -------------------- LOGIN --------------------
 def login_screen():
     users = load_users()
-    st.markdown('<div class="glass card">', unsafe_allow_html=True)
     st.markdown(f"""
     <div class="robots">
       <img class="robot-sit" src="{ROBOT_LEFT}" width="84">
       <img class="robot-mid" src="{ROBOT_MID}" width="112">
       <img class="robot-sit" src="{ROBOT_RIGHT}" width="84">
     </div>
+    <div class="h1">{APP_TITLE}</div>
+    <div class="subtle">Acede à tua conta para começar 🚀</div>
     """, unsafe_allow_html=True)
-    st.markdown(f'<div class="h1">{APP_TITLE}</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subtle">Acede à tua conta para começar 🚀</div>', unsafe_allow_html=True)
-    st.write("")
 
     with st.form("login_form", clear_on_submit=False):
         u = st.text_input("👤 Utilizador")
         p = st.text_input("🔑 Palavra-passe", type="password")
         ok = st.form_submit_button("Entrar", use_container_width=True)
         if ok:
+            users = load_users()
             if u in users and users[u].get("password")==p:
-                st.session_state["logged_in"]=True
-                st.session_state["username"]=u
-                st.session_state["mode"]="main"
+                st.session_state.update({"logged_in":True,"username":u,"mode":"main"})
                 st.success(f"Bem-vindo, {u} 👋")
-                time.sleep(0.5); st.rerun()
+                time.sleep(0.5)
+                st.rerun()
             else:
                 st.error("❌ Credenciais incorretas.")
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------- MAIN --------------------
 def main_page():
     user = st.session_state.get("username","")
-    st.markdown('<div class="glass card">', unsafe_allow_html=True)
-    st.markdown(f'<div class="h1">{APP_TITLE} — Starter 3.0</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="h1">{APP_TITLE} — Starter 3.1</div>', unsafe_allow_html=True)
     st.markdown('<div class="subtle">Cria legendas otimizadas com análise real de engajamento 📊</div>', unsafe_allow_html=True)
     st.write("")
 
@@ -182,10 +205,8 @@ def main_page():
         tone = st.radio("🎚️ Tom de voz", ["Neutro","Inspirador"], horizontal=True)
 
     colA, colB = st.columns(2)
-    gen = colA.button("⚡ Gerar Conteúdo", use_container_width=True, key="gen_btn")
-    hist = colB.button("📜 Histórico", use_container_width=True, key="hist_btn")
-
-    st.markdown('</div>', unsafe_allow_html=True)
+    gen = colA.button("⚡ Gerar Conteúdo", use_container_width=True)
+    hist = colB.button("📜 Histórico", use_container_width=True)
 
     if hist:
         st.session_state["mode"]="history"; st.rerun()
@@ -198,32 +219,28 @@ def main_page():
             captions = gen_two_captions(theme, niche, tone)
             stats = [dynamic_stats(seed=random.randint(1,999999)) for _ in range(2)]
 
-        st.subheader("🧠 Legendas sugeridas:")
+        st.markdown("### 🧠 Legendas sugeridas:")
         for i, cap in enumerate(captions, start=1):
             pct, hr, note = stats[i-1]
-            st.markdown('<div class="glass card">', unsafe_allow_html=True)
-            st.markdown(f"**{i}.** {cap}")
-            st.markdown(
-                f'''
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin:.5rem 0 0 .1rem;">
-                  <div class="badge">📈 Engajamento: +{pct}%</div>
-                  <div class="badge">🕒 Hora ideal: {hr} — {note}</div>
+            st.markdown(f"""
+            <div class="glass-card">
+                <p style="font-size:16px;margin-bottom:10px;">{i}. {cap}</p>
+                <div style="margin-top:8px;margin-bottom:8px;">
+                    <span class="badge">📈 Engajamento: +{pct}%</span>
+                    <span class="badge">🕒 Hora ideal: {hr} — {note}</span>
                 </div>
-                ''',
-                unsafe_allow_html=True
-            )
-            js_copy_button(f"📋 Copiar {i}", cap, key=f"copy_{uuid.uuid4().hex}")
-            st.markdown('</div>', unsafe_allow_html=True)
+            </div>
+            """, unsafe_allow_html=True)
+            js_copy_button(f"📋 Copiar {i}", cap, key=f"copy_{i}_{uuid.uuid4().hex()}")
 
         now = datetime.now().strftime("%d/%m/%Y %H:%M")
-        record = {
+        save_history(user, {
             "when": now, "theme": theme, "niche": niche, "tone": tone,
             "items": [
                 {"caption": captions[0], "engagement": stats[0][0], "hour": stats[0][1], "note": stats[0][2]},
                 {"caption": captions[1], "engagement": stats[1][0], "hour": stats[1][1], "note": stats[1][2]},
             ]
-        }
-        save_history(user, record)
+        })
         st.success("Guardado no teu histórico. 📜")
 
 # -------------------- HISTÓRICO --------------------
@@ -233,30 +250,31 @@ def history_page():
     st.subheader("📜 Histórico de Gerações")
     if not data:
         st.info("Ainda não geraste nenhuma legenda.")
-        if st.button("⬅️ Voltar", key="back_empty"): st.session_state["mode"]="main"; st.rerun()
+        if st.button("⬅️ Voltar"): st.session_state["mode"]="main"; st.rerun()
         return
 
     for i, rec in enumerate(data, start=1):
         st.markdown(f"**🗓️ {rec['when']} — Tema:** *{rec['theme']}*  **({rec['niche']}, {rec['tone']})*")
         for j, it in enumerate(rec["items"], start=1):
-            st.markdown('<div class="glass card">', unsafe_allow_html=True)
-            st.markdown(f"**💬 Legenda {i}.{j}:** {it['caption']}")
-            st.markdown(
-                f'<div class="badge">📊 +{it["engagement"]}%</div> &nbsp; '
-                f'<div class="badge">🕒 {it["hour"]} — {it["note"]}</div>',
-                unsafe_allow_html=True
-            )
-            js_copy_button(f"📋 Copiar {i}-{j}", it["caption"], key=f"copy_hist_{uuid.uuid4().hex}")
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="glass-card">
+              <p style="margin-bottom:8px;"><b>💬 Legenda {i}.{j}:</b> {it['caption']}</p>
+              <div>
+                <span class="badge">📊 +{it['engagement']}%</span>
+                <span class="badge">🕒 {it['hour']} — {it['note']}</span>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+            js_copy_button(f"📋 Copiar {i}-{j}", it["caption"], key=f"copy_hist_{uuid.uuid4().hex()}")
         st.markdown("<hr/>", unsafe_allow_html=True)
 
-    if st.button("⬅️ Voltar", key="back_hist"): st.session_state["mode"]="main"; st.rerun()
+    if st.button("⬅️ Voltar"): st.session_state["mode"]="main"; st.rerun()
 
-# -------------------- NAV / AUTH --------------------
+# -------------------- NAV --------------------
 def logout_pill():
     with st.sidebar:
-        st.markdown("##### 👋 Logado como **{}**".format(st.session_state.get("username","")))
-        if st.button("Sair", key="logout_btn"):
+        st.markdown(f"##### 👋 Logado como **{st.session_state.get('username','')}**")
+        if st.button("Sair"):
             for k in ["logged_in","username","mode"]: st.session_state.pop(k, None)
             st.rerun()
 
