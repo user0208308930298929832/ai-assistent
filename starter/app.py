@@ -1,16 +1,21 @@
 import sys, os
 from pathlib import Path
 
-# === FIX FINAL PARA IMPORTS NO STREAMLIT CLOUD ===
-# Garante que o diretório base (onde está "shared") entra no sys.path
-BASE_DIR = Path(__file__).resolve().parents[1]   # /mount/src/ai-assistent
-SHARED_PATH = BASE_DIR / "shared"
-if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
-if str(SHARED_PATH) not in sys.path:
-    sys.path.insert(0, str(SHARED_PATH))
-os.chdir(str(BASE_DIR))  # força o working directory correto
-# =================================================
+# === FIX UNIVERSAL PARA IMPORTAR "shared" NO STREAMLIT CLOUD ===
+# Caminho absoluto da raiz do projeto
+CURRENT_DIR = Path(__file__).resolve().parent       # /starter
+ROOT_DIR = CURRENT_DIR.parent                       # /ai-assistent
+SHARED_PATH = ROOT_DIR / "shared"
+
+# Garante que o Python sabe onde está a pasta "shared"
+sys.path.insert(0, str(ROOT_DIR))
+sys.path.insert(0, str(SHARED_PATH))
+os.environ["PYTHONPATH"] = str(ROOT_DIR)
+
+# Verificação opcional (só para debug)
+print("🔧 PATHS:", sys.path[:3])
+print("📁 Current working dir:", os.getcwd())
+# ================================================================
 
 import streamlit as st
 from shared.utils import (
