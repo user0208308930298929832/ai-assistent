@@ -1,4 +1,6 @@
 import streamlit as st
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from shared.utils import (
     inject_css, login_card, logout_pill, get_client,
     engagement_and_time, add_history, get_history, copy_button
