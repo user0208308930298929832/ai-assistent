@@ -1,5 +1,5 @@
 {
-  "miguel": { "password": "1234", "plan": "starter" },
-  "admin": { "password": "admin123", "plan": "pro" },
-  "teste": { "password": "abc123", "plan": "starter" }
+    "miguel": "1234",
+    "admin": "admin123",
+    "teste": "teste123"
 }
