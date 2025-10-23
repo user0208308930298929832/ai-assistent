@@ -166,15 +166,19 @@ def save_history(username: str, record: dict):
         json.dump(items, f, ensure_ascii=False, indent=2)
 
 def js_copy_button(label: str, text: str, key: str):
-    """Botão Copiar com JS (sem dependências)."""
-    # Evita problemas de aspas: b64 -> atob no browser
-    b64 = base64.b64encode(text.encode("utf-8")).decode("ascii")
-    html = f"""
-    <button class="copy-btn" id="{key}" onclick="navigator.clipboard.writeText(atob('{b64}')).then(()=>{
-      const b=document.getElementById('{key}'); if(b){{b.innerText='Copiado! ✅'; setTimeout(()=>{{b.innerText='{label}';}},1200);}}
-    })">{label}</button>
+    import html
+    safe_text = html.escape(text).replace("'", "\\'")
+    html_code = f"""
+    <button class="copy-btn" id="{key}" onclick="
+        navigator.clipboard.writeText('{safe_text}');
+        const btn = document.getElementById('{key}');
+        if (btn) {{
+            btn.innerText = 'Copiado! ✅';
+            setTimeout(() => {{ btn.innerText = '{label}'; }}, 1200);
+        }}
+    ">{label}</button>
     """
-    st.markdown(html, unsafe_allow_html=True)
+    st.markdown(html_code, unsafe_allow_html=True)
 
 def dynamic_engagement_and_time(seed: int = None):
     """Gera percentagens e horários diferentes/realistas."""
@@ -227,36 +231,89 @@ def gen_captions(theme: str, niche: str, tone: str):
 def login_screen():
     users = load_users()
 
-    st.markdown('<div class="glass card fade-in">', unsafe_allow_html=True)
-
-    # Linha dos três robôs (laranja esq., azulão centro, azul dir.)
-    st.markdown(f"""
-    <div class="robots">
-      <img class="robot-sit" src="{ROBOT_LEFT}"  width="84">
-      <img class="robot-mid" src="{ROBOT_MID}"   width="110">
-      <img class="robot-sit" src="{ROBOT_RIGHT}" width="84">
-    </div>
+    # Fundo + container principal
+    st.markdown("""
+        <style>
+        .login-bg {
+            background: radial-gradient(800px 600px at 50% 0%, #0b1118 0%, #060b10 100%);
+            padding: 50px 0 60px 0;
+            text-align: center;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.45);
+        }
+        .login-img {
+            width: 360px;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 0 20px rgba(0,200,255,0.35));
+        }
+        .login-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #3ee6ff;
+            text-shadow: 0 0 25px rgba(0, 220, 255, .35);
+            margin-bottom: 8px;
+        }
+        .login-sub {
+            color: #d3ecff;
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .login-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 2rem 2.5rem;
+            backdrop-filter: blur(10px);
+            display: inline-block;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.4);
+        }
+        input {
+            border-radius: 8px !important;
+        }
+        .stButton button {
+            background: linear-gradient(90deg, #1ebfff 0%, #00aaff 100%) !important;
+            border: none !important;
+            border-radius: 10px !important;
+            color: #fff !important;
+            font-weight: 700 !important;
+            letter-spacing: .3px;
+            height: 45px;
+        }
+        </style>
     """, unsafe_allow_html=True)
 
-    st.markdown(f'<div class="h1-title accent">{APP_TITLE}</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subtle">Acede à tua conta para começar 🚀</div>', unsafe_allow_html=True)
-    st.write("")
+    # Fundo e imagem principal
+    st.markdown('<div class="login-bg fade-in">', unsafe_allow_html=True)
 
+    # Tenta carregar imagem local (robots_3d_login.png)
+    robot_path = Path(__file__).parent / "assets" / "robots_3d_login.png"
+    if robot_path.exists():
+        st.image(str(robot_path), use_container_width=False, output_format="PNG")
+    else:
+        st.image("https://i.imgur.com/EHxjUoT.png", use_container_width=False)  # placeholder
+
+    # Título e subtítulo
+    st.markdown('<div class="login-title">AI Social Automator</div>', unsafe_allow_html=True)
+    st.markdown('<div class="login-sub">Acede à tua conta para começar 🚀</div>', unsafe_allow_html=True)
+
+    # Formulário
     with st.form("login_form", clear_on_submit=False):
-        u = st.text_input("👤 Utilizador")
-        p = st.text_input("🔑 Palavra-passe", type="password")
-        ok = st.form_submit_button("Entrar", use_container_width=True)
-        if ok:
-            if u in users and users[u].get("password") == p:
+        username = st.text_input("👤 Utilizador")
+        password = st.text_input("🔑 Palavra-passe", type="password")
+        submit = st.form_submit_button("Entrar", use_container_width=True)
+
+        if submit:
+            if username in users and users[username].get("password") == password:
                 st.session_state["logged_in"] = True
-                st.session_state["username"] = u
+                st.session_state["username"] = username
                 st.session_state["mode"] = "main"
-                st.success(f"Bem-vindo, {u} 👋")
+                st.success(f"Bem-vindo, {username} 👋")
+                time.sleep(0.8)
                 st.rerun()
             else:
                 st.error("❌ Utilizador ou palavra-passe incorretos.")
-    st.markdown('</div>', unsafe_allow_html=True)
 
+    st.markdown("</div>", unsafe_allow_html=True)
 # =========================
 #   PÁGINA PRINCIPAL
 # =========================
