@@ -4,6 +4,55 @@ import json, os, random, time, requests
 from datetime import datetime
 
 # ================================
+# 🎨 ESTILO GLOBAL GLASS
+# ================================
+GLASS_STYLE = """
+<style>
+[data-testid="stSidebar"] { background: rgba(255,255,255,0.07) !important; backdrop-filter: blur(12px); }
+header { visibility: hidden; }
+body, .stApp {
+    background: radial-gradient(circle at 20% 30%, #0a0f16 0%, #000 100%) !important;
+    font-family: 'Inter', sans-serif !important;
+    color: #e8faff !important;
+}
+div[data-testid="stMarkdownContainer"] { color: #e8faff !important; }
+
+.glass-box {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,255,255,0.05);
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem;
+    animation: fadeIn 0.8s ease-in-out;
+}
+.glass-title {
+    text-align:center;
+    font-size:1.8rem;
+    font-weight:700;
+    color:#00f6ff;
+}
+button {
+    border-radius:10px!important;
+}
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(10px);}
+  to {opacity:1; transform:translateY(0);}
+}
+.copy-btn {
+    background-color:#00f6ff;
+    color:#000;
+    border:none;
+    padding:8px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+}
+</style>
+"""
+
+# ================================
 # 🔐 LOGIN SYSTEM
 # ================================
 def load_users():
@@ -12,150 +61,87 @@ def load_users():
         return json.load(f)
 
 def login():
-    """Página de login moderna e centrada"""
+    """Página de login moderna em vidro"""
     st.set_page_config(page_title="AI Social Automator — Login", layout="centered")
+    st.markdown(GLASS_STYLE, unsafe_allow_html=True)
 
-    st.markdown("""
-        <style>
-        [data-testid="stSidebar"] { display: none; }
-        header { visibility: hidden; }
-        body, .stApp {
-            background: radial-gradient(circle at 20% 30%, #1b1b1b 0%, #111 100%) !important;
-            font-family: 'Inter', sans-serif !important;
-            color: white;
-        }
-        .login-box {
-            background-color: #fff;
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            padding: 3rem 3rem 2rem 3rem;
-            text-align: center;
-            color: #333;
-            max-width: 400px;
-            margin: auto;
-            margin-top: 10%;
-            animation: fadeIn 1s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .title { font-size: 1.7rem; font-weight: 700; color: #ff7b00; margin-bottom: .3rem; }
-        .subtitle { font-size: .9rem; color: #777; margin-bottom: 2rem; }
-        </style>
-    """, unsafe_allow_html=True)
-
-    st.markdown('<div class="login-box">', unsafe_allow_html=True)
-    st.image("https://cdn-icons-png.flaticon.com/512/4712/4712109.png", width=80)
-    st.markdown('<div class="title">AI Social Automator</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subtitle">Acede à tua conta para começar 🚀</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glass-box">', unsafe_allow_html=True)
+    st.image("https://cdn-icons-png.flaticon.com/512/4712/4712109.png", width=90)
+    st.markdown('<div class="glass-title">AI Social Automator</div>', unsafe_allow_html=True)
+    st.markdown('<p style="text-align:center;color:#b0eaff;">Acede à tua conta para começar 🚀</p>', unsafe_allow_html=True)
 
     username = st.text_input("👤 Utilizador")
     password = st.text_input("🔑 Palavra-passe", type="password")
 
     users = load_users()
-
     if st.button("Entrar", use_container_width=True):
         if username in users and users[username]["password"] == password:
             st.session_state["logged_in"] = True
             st.session_state["username"] = username
-            st.session_state["plan"] = users[username].get("plan", "starter")
             st.session_state.setdefault("history", [])
             st.success(f"Bem-vindo, {username.capitalize()} 👋")
-            time.sleep(0.5)
+            time.sleep(0.4)
             st.rerun()
         else:
             st.error("❌ Credenciais incorretas.")
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ================================
-# 📊 FUNÇÕES AUXILIARES
+# ⚙️ FUNÇÕES AUXILIARES
 # ================================
-def random_boost():
-    return round(random.uniform(5.0, 9.5), 1)
-
+def random_boost(): return round(random.uniform(5.0, 9.5), 1)
 def random_hour():
-    horas = [
-        "09:00 — manhã, bom para lifestyle ☀️",
-        "13:00 — hora de almoço 🍽️",
-        "18:00 — pico de atividade 📈",
-        "21:00 — posts noturnos de alto alcance 🌙"
-    ]
+    horas = ["09:00 — manhã ☀️","13:00 — almoço 🍽️","18:00 — pico 📈","21:00 — noite 🌙"]
     return random.choice(horas)
-
-def typing_effect(text, speed=0.015):
-    placeholder = st.empty()
-    typed = ""
-    for char in text:
-        typed += char
-        placeholder.markdown(f"<p style='font-size:1.05rem; color:#fff;'>{typed}</p>", unsafe_allow_html=True)
-        time.sleep(speed)
 
 # ================================
 # 🚀 APP PRINCIPAL
 # ================================
 def main_app():
-    st.set_page_config(page_title="AI Social Automator — Starter 2.6", layout="centered")
+    st.set_page_config(page_title="AI Social Automator — Starter 2.7", layout="centered")
+    st.markdown(GLASS_STYLE, unsafe_allow_html=True)
     st.sidebar.success(f"👋 Logado como {st.session_state['username']}")
-
-    if st.sidebar.button("📜 Histórico"):
-        show_history()
-        st.stop()
-
+    if st.sidebar.button("📜 Histórico"): show_history(); st.stop()
     if st.sidebar.button("🚪 Sair"):
-        for k in ["logged_in", "username", "plan", "history"]:
-            st.session_state.pop(k, None)
+        for k in ["logged_in","username","history"]: st.session_state.pop(k, None)
         st.rerun()
 
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    st.markdown("<h1 style='text-align:center;'>🤖 AI Social Automator — Starter 2.6</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center;'>Cria legendas otimizadas, tons de voz e guarda o teu histórico de criações 📊</p>", unsafe_allow_html=True)
-    st.write("---")
+    st.markdown('<div class="glass-box">', unsafe_allow_html=True)
+    st.markdown('<div class="glass-title">🤖 AI Social Automator — Starter 2.7</div>', unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center;color:#b0eaff;'>Cria legendas otimizadas e guarda o teu histórico ✨</p>", unsafe_allow_html=True)
 
     tema = st.text_area("✍️ Tema do post:", placeholder="Ex.: Nova coleção de outono – elegância e conforto.")
-    nicho = st.selectbox("📌 Nicho", ["Geral", "Moda", "Beleza", "Restaurantes", "Tecnologia", "Fitness"])
-    tom = st.radio("🎯 Tom de voz", ["Neutro", "Inspirador"])
+    nicho = st.selectbox("📌 Nicho", ["Geral","Moda","Beleza","Restaurantes","Tecnologia","Fitness"])
+    tom = st.radio("🎯 Tom de voz", ["Neutro","Inspirador"])
 
     if st.button("⚡ Gerar Conteúdo", use_container_width=True):
-        if not tema.strip():
-            st.warning("Escreve o tema primeiro! ⚠️")
+        if not tema.strip(): st.warning("Escreve o tema primeiro! ⚠️")
         else:
             with st.spinner("✨ A criar legendas otimizadas..."):
                 prompt = f"Cria DUAS legendas curtas e criativas em português de Portugal sobre '{tema}'. Nicho: {nicho}. Tom: {tom}. Inclui hashtags no fim."
                 resposta = client.chat.completions.create(
                     model="gpt-4o-mini",
-                    messages=[{"role": "user", "content": prompt}]
+                    messages=[{"role":"user","content":prompt}]
                 )
                 texto = resposta.choices[0].message.content
                 variações = texto.split("\n\n")
 
-            st.subheader("🧠 Legendas sugeridas:")
-
             legendas_geradas = []
-            for i, var in enumerate(variações[:2], 1):
+            for i,var in enumerate(variações[:2],1):
                 boost = random_boost()
                 hora = random_hour()
+                st.markdown(f"""
+                <div class='glass-box'>
+                    <h4>💬 Legenda {i}</h4>
+                    <p>{var.strip()}</p>
+                    <p style='color:#b0eaff;'>📈 Engajamento estimado: +{boost}%<br>⏰ Hora ideal: {hora}</p>
+                    <button class='copy-btn' onclick="navigator.clipboard.writeText(`{var.strip()}`)">📋 Copiar</button>
+                </div>
+                """, unsafe_allow_html=True)
+                legendas_geradas.append({"texto":var.strip(),"boost":boost,"hora":hora})
 
-                with st.container():
-                    st.markdown(f"**💬 Legenda {i}:**")
-                    typing_effect(var.strip())
-
-                    col1, col2 = st.columns([1, 6])
-                    with col1:
-                        if st.button(f"📋 Copiar {i}", key=f"copy_{i}"):
-                            st.session_state["copied"] = var.strip()
-                            st.success("Copiado com sucesso!")
-                    with col2:
-                        st.info(f"📈 Engajamento estimado: +{boost}% | ⏰ Hora ideal: {hora}")
-
-                legendas_geradas.append({
-                    "texto": var.strip(),
-                    "boost": boost,
-                    "hora": hora
-                })
-
-            # Salva no histórico
             st.session_state["history"].append({
                 "data": datetime.now().strftime("%d/%m/%Y %H:%M"),
                 "tema": tema,
@@ -163,33 +149,33 @@ def main_app():
                 "tom": tom,
                 "legendas": legendas_geradas
             })
-
+    st.markdown("</div>", unsafe_allow_html=True)
     st.caption("Plano Starter · Modelo: GPT-4o-mini · © 2025 AI Social Automator")
 
 # ================================
-# 📜 MODO HISTÓRICO
+# 📜 HISTÓRICO VISUAL GLASS
 # ================================
 def show_history():
+    st.set_page_config(page_title="Histórico — AI Social Automator", layout="centered")
+    st.markdown(GLASS_STYLE, unsafe_allow_html=True)
     st.title("📜 Histórico de Gerações")
     if "history" not in st.session_state or not st.session_state["history"]:
         st.info("Ainda não geraste nenhuma legenda!")
-        if st.button("⬅️ Voltar"):
-            st.rerun()
-        return
+        if st.button("⬅️ Voltar"): st.rerun(); return
 
-    for idx, item in enumerate(reversed(st.session_state["history"]), 1):
-        st.markdown(f"### 🗓️ {item['data']} — Tema: *{item['tema']}* ({item['nicho']}, {item['tom']})")
-        for j, leg in enumerate(item["legendas"], 1):
-            st.markdown(f"**💬 Legenda {j}:** {leg['texto']}")
-            st.caption(f"📈 +{leg['boost']}% | ⏰ {leg['hora']}")
-            if st.button(f"📋 Copiar {idx}-{j}", key=f"copy_hist_{idx}_{j}"):
-                st.session_state["copied"] = leg["texto"]
-                st.success("Copiado!")
+    for idx,item in enumerate(reversed(st.session_state["history"]),1):
+        st.markdown(f"<div class='glass-box'><h3>🗓️ {item['data']} — {item['tema']}</h3><p><i>{item['nicho']} | {item['tom']}</i></p>", unsafe_allow_html=True)
+        for j,leg in enumerate(item["legendas"],1):
+            st.markdown(f"""
+                <div style='margin-top:1rem;margin-bottom:1rem;padding:1rem;border-radius:15px;background:rgba(255,255,255,0.05);'>
+                    <b>💬 Legenda {j}:</b><br>{leg['texto']}<br>
+                    <span style='color:#b0eaff;'>📈 +{leg['boost']}% | ⏰ {leg['hora']}</span><br><br>
+                    <button class='copy-btn' onclick="navigator.clipboard.writeText(`{leg['texto']}`)">📋 Copiar</button>
+                </div>
+            """, unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-        st.markdown("---")
-
-    if st.button("⬅️ Voltar"):
-        st.rerun()
+    if st.button("⬅️ Voltar"): st.rerun()
 
 # ================================
 # 🧭 EXECUÇÃO
