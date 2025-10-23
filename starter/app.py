@@ -1,3 +1,15 @@
+import sys, os
+from pathlib import Path
+
+# --- FIX IMPORT PATH ---
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.append(str(BASE_DIR))
+
+# --- AGORA O IMPORT FUNCIONA ---
+from shared.utils import (
+    inject_css, login_card, logout_pill, get_client
+)
 import streamlit as st
 import sys, os
 
