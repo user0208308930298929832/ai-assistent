@@ -1,10 +1,18 @@
 import streamlit as st
 import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+# --- Fix de imports relativos no Streamlit Cloud ---
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(current_dir)
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+# Agora já pode importar o shared normalmente
 from shared.utils import (
     inject_css, login_card, logout_pill, get_client,
     engagement_and_time, add_history, get_history, copy_button
 )
+
 from datetime import datetime
 
 # ---------------- CONFIG ----------------
