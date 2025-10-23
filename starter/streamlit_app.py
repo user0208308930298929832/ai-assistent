@@ -154,29 +154,95 @@ def gen_two_captions(theme,niche,tone):
 
 # -------------------- LOGIN --------------------
 def login_screen():
-    users=load_users()
-    st.markdown(f"""
-    <div class="robots">
-      <img class="robot-sit" src="{ROBOT_LEFT}" width="84">
-      <img class="robot-mid" src="{ROBOT_MID}" width="112">
-      <img class="robot-sit" src="{ROBOT_RIGHT}" width="84">
-    </div>
-    <div class="h1">{APP_TITLE}</div>
-    <div class="subtle">Acede à tua conta para começar 🚀</div>
-    """,unsafe_allow_html=True)
+    users = load_users()
 
-    with st.form("login_form",clear_on_submit=False):
-        u=st.text_input("👤 Utilizador")
-        p=st.text_input("🔑 Palavra-passe",type="password")
-        ok=st.form_submit_button("Entrar",use_container_width=True)
-        if ok:
-            if u in users and users[u].get("password")==p:
-                st.session_state.update({"logged_in":True,"username":u,"mode":"main"})
-                st.success(f"Bem-vindo, {u} 👋")
-                time.sleep(0.5);st.rerun()
-            else:
-                st.error("❌ Credenciais incorretas.")
+    # Fundo com efeito vidro
+    st.markdown("""
+    <style>
+    .login-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(160,220,255,0.18);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 200, 255, 0.15);
+      backdrop-filter: blur(16px);
+      padding: 40px 50px 35px 50px;
+      margin: 60px auto;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+      animation: fadein 1s ease-out;
+    }
+    @keyframes fadein {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    .login-card h1 {
+      font-size: 2.2rem;
+      color: #9be3ff;
+      text-shadow: 0 0 18px rgba(90,200,255,.25);
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .login-card p {
+      color: #bcd4e6;
+      margin-bottom: 30px;
+      font-size: 1rem;
+    }
+    .stTextInput label {
+      font-weight: 600;
+      color: #a4d4f7 !important;
+      font-size: 0.9rem !important;
+      letter-spacing: 0.3px;
+    }
+    div[data-baseweb="input"] > div {
+      background-color: rgba(10,20,30,0.6) !important;
+      border: 1px solid rgba(150,220,255,0.25) !important;
+      border-radius: 10px !important;
+    }
+    input {
+      color: #e8f4ff !important;
+    }
+    /* Botão Login */
+    .stButton > button {
+      width: 100%;
+      background: linear-gradient(90deg,#00baff,#0078ff);
+      color: #00141e;
+      font-weight: 700;
+      font-size: 1.05rem;
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 0 18px rgba(0,180,255,0.35);
+      transition: all 0.25s ease;
+      height: 46px;
+    }
+    .stButton > button:hover {
+      box-shadow: 0 0 35px rgba(0,200,255,0.5);
+      transform: translateY(-1px);
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
+    # Cartão de login
+    with st.container():
+        st.markdown('<div class="login-card">', unsafe_allow_html=True)
+        st.markdown("<h1>AI Social Automator</h1>", unsafe_allow_html=True)
+        st.markdown("<p>Acede à tua conta para começar 🚀</p>", unsafe_allow_html=True)
+
+        with st.form("login_form", clear_on_submit=False):
+            u = st.text_input("👤 Utilizador", placeholder="Insere o teu utilizador")
+            p = st.text_input("🔑 Palavra-passe", type="password", placeholder="Insere a tua palavra-passe")
+            ok = st.form_submit_button("✨ Entrar")
+
+            if ok:
+                if u in users and users[u].get("password") == p:
+                    st.session_state.update({"logged_in": True, "username": u, "mode": "main"})
+                    st.success(f"Bem-vindo, {u} 👋")
+                    time.sleep(0.6)
+                    st.rerun()
+                else:
+                    st.error("❌ Credenciais incorretas.")
+
+        st.markdown("</div>", unsafe_allow_html=True)
 # -------------------- MAIN --------------------
 def main_page():
     user=st.session_state.get("username","")
