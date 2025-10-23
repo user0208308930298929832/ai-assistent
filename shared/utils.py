@@ -125,3 +125,19 @@ def get_client():
         st.warning("⚠️ Adiciona a tua chave em Settings → Secrets → OPENAI_API_KEY")
         st.stop()
     return OpenAI(api_key=api)
+# ============================================================
+# Função engagement_and_time (placeholder funcional)
+# ============================================================
+def engagement_and_time(prompt: str) -> dict:
+    """
+    Gera dados fictícios de engagement e hora ideal de publicação.
+    (Pode ser adaptado para cálculo real com IA futuramente)
+    """
+    import random, datetime
+    best_hour = random.choice(["09:00", "12:30", "18:45", "21:00"])
+    engagement_score = random.randint(60, 98)
+    return {
+        "prompt": prompt,
+        "best_hour": best_hour,
+        "engagement_score": engagement_score
+    }
