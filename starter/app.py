@@ -1,15 +1,16 @@
 import sys, os
 from pathlib import Path
 
-# === FIX DEFINITIVO PARA IMPORTAR "shared" NO STREAMLIT CLOUD ===
-CURRENT_DIR = Path(__file__).resolve().parent        # /starter
-ROOT_DIR = CURRENT_DIR.parent                        # /ai-assistent
-SHARED_DIR = ROOT_DIR / "shared"
-
-for p in [ROOT_DIR, SHARED_DIR]:
-    if str(p) not in sys.path:
-        sys.path.append(str(p))
-# ================================================================
+# === FIX FINAL PARA IMPORTS NO STREAMLIT CLOUD ===
+# Garante que o diretório base (onde está "shared") entra no sys.path
+BASE_DIR = Path(__file__).resolve().parents[1]   # /mount/src/ai-assistent
+SHARED_PATH = BASE_DIR / "shared"
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+if str(SHARED_PATH) not in sys.path:
+    sys.path.insert(0, str(SHARED_PATH))
+os.chdir(str(BASE_DIR))  # força o working directory correto
+# =================================================
 
 import streamlit as st
 from shared.utils import (
@@ -17,7 +18,6 @@ from shared.utils import (
     engagement_and_time, add_history, get_history, copy_button
 )
 from datetime import datetime
-
 # ---------------- CONFIG ----------------
 st.set_page_config(
     page_title="AI Social Automator — Starter",
