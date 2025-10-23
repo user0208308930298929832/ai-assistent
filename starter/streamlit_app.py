@@ -161,62 +161,65 @@ def login_screen():
     .login-box {
         background: rgba(255,255,255,0.04);
         border: 1px solid rgba(120,190,255,0.25);
-        border-radius: 18px;
-        padding: 40px 50px;
+        border-radius: 16px;
+        padding: 32px 38px;
         width: 100%;
-        max-width: 420px;
-        margin: 100px auto;
+        max-width: 360px;
+        margin: 120px auto;
         text-align: center;
-        box-shadow: 0 6px 25px rgba(0, 100, 255, 0.15);
-        backdrop-filter: blur(12px);
+        box-shadow: 0 6px 20px rgba(0, 100, 255, 0.12);
+        backdrop-filter: blur(10px);
     }
     .login-title {
-        font-size: 2.1rem;
+        font-size: 1.8rem;
         font-weight: 800;
         color: #38b6ff;
-        text-shadow: 0 0 12px rgba(0,180,255,0.45);
-        margin-bottom: 6px;
+        text-shadow: 0 0 10px rgba(0,180,255,0.4);
+        margin-bottom: 4px;
     }
     .login-sub {
         color: #b9d6f2;
-        margin-bottom: 28px;
+        margin-bottom: 22px;
+        font-size: 0.95rem;
     }
     .stTextInput label {
         font-weight: 600;
         color: #9bd2ff !important;
-        font-size: 0.9rem !important;
+        font-size: 0.85rem !important;
         text-align: left;
+        margin-bottom: 4px;
     }
     div[data-baseweb="input"] > div {
         border: 1px solid rgba(150,210,255,0.35) !important;
-        border-radius: 12px !important;
+        border-radius: 10px !important;
         background: rgba(10,20,30,0.65) !important;
         transition: all 0.25s ease;
+        height: 36px !important;
     }
     div[data-baseweb="input"]:focus-within > div {
         border: 1px solid #38b6ff !important;
-        box-shadow: 0 0 12px rgba(56,182,255,0.45) !important;
+        box-shadow: 0 0 8px rgba(56,182,255,0.35) !important;
         background: rgba(10,25,40,0.85) !important;
     }
     input {
         color: #e8f4ff !important;
-        font-size: 0.95rem !important;
+        font-size: 0.9rem !important;
     }
     .stButton > button {
         background: linear-gradient(90deg,#0078ff,#00bfff);
         color: white;
         font-weight: 700;
-        border-radius: 12px;
+        border-radius: 10px;
         border: none;
-        padding: 6px 0;
+        padding: 4px 0;
         width: 100%;
         margin-top: 10px;
-        height: 40px;
-        box-shadow: 0 0 14px rgba(0,150,255,0.35);
+        height: 36px;
+        box-shadow: 0 0 10px rgba(0,150,255,0.3);
         transition: all 0.25s ease;
     }
     .stButton > button:hover {
-        box-shadow: 0 0 25px rgba(0,180,255,0.5);
+        box-shadow: 0 0 18px rgba(0,180,255,0.45);
         transform: translateY(-1px);
     }
     </style>
