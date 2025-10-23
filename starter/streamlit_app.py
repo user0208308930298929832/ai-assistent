@@ -70,13 +70,13 @@ def save_history(username:str, record:dict):
 
 # ---------- BOTÃO COPIAR (NOVA VERSÃO) ----------
 def js_copy_button(label: str, text: str, key: str | None = None):
-    """Botão de copiar robusto (Base64 → Clipboard via JS)."""
+    """Botão de copiar robusto (Base64 → Clipboard via JS, compatível com emojis)."""
     if key is None:
         key = f"copy_{uuid.uuid4().hex}"
 
     b64 = base64.b64encode(text.encode("utf-8")).decode("ascii")
 
-    html = f"""
+    html = """
     <div style="display:inline-flex;align-items:center;gap:10px;">
       <button id="{key}" class="copy-btn">{label}</button>
       <script>
@@ -102,7 +102,8 @@ def js_copy_button(label: str, text: str, key: str | None = None):
         }})();
       </script>
     </div>
-    """
+    """.format(key=key, label=label, b64=b64)
+
     components.html(html, height=60, scrolling=False)
 
 def dynamic_stats(seed=None):
