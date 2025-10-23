@@ -156,93 +156,92 @@ def gen_two_captions(theme,niche,tone):
 def login_screen():
     users = load_users()
 
-    # Fundo com efeito vidro
     st.markdown("""
     <style>
-    .login-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(160,220,255,0.18);
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 200, 255, 0.15);
-      backdrop-filter: blur(16px);
-      padding: 40px 50px 35px 50px;
-      margin: 60px auto;
-      width: 100%;
-      max-width: 480px;
-      text-align: center;
-      animation: fadein 1s ease-out;
+    .login-box {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(120,190,255,0.25);
+        border-radius: 18px;
+        padding: 40px 50px;
+        width: 100%;
+        max-width: 420px;
+        margin: 100px auto;
+        text-align: center;
+        box-shadow: 0 6px 25px rgba(0, 100, 255, 0.15);
+        backdrop-filter: blur(12px);
     }
-    @keyframes fadein {
-      from {opacity: 0; transform: translateY(20px);}
-      to {opacity: 1; transform: translateY(0);}
+    .login-title {
+        font-size: 2.1rem;
+        font-weight: 800;
+        color: #38b6ff;
+        text-shadow: 0 0 12px rgba(0,180,255,0.45);
+        margin-bottom: 6px;
     }
-    .login-card h1 {
-      font-size: 2.2rem;
-      color: #9be3ff;
-      text-shadow: 0 0 18px rgba(90,200,255,.25);
-      font-weight: 800;
-      margin-bottom: 6px;
-    }
-    .login-card p {
-      color: #bcd4e6;
-      margin-bottom: 30px;
-      font-size: 1rem;
+    .login-sub {
+        color: #b9d6f2;
+        margin-bottom: 28px;
     }
     .stTextInput label {
-      font-weight: 600;
-      color: #a4d4f7 !important;
-      font-size: 0.9rem !important;
-      letter-spacing: 0.3px;
+        font-weight: 600;
+        color: #9bd2ff !important;
+        font-size: 0.9rem !important;
+        text-align: left;
     }
     div[data-baseweb="input"] > div {
-      background-color: rgba(10,20,30,0.6) !important;
-      border: 1px solid rgba(150,220,255,0.25) !important;
-      border-radius: 10px !important;
+        border: 1px solid rgba(150,210,255,0.35) !important;
+        border-radius: 12px !important;
+        background: rgba(10,20,30,0.65) !important;
+        transition: all 0.25s ease;
+    }
+    div[data-baseweb="input"]:focus-within > div {
+        border: 1px solid #38b6ff !important;
+        box-shadow: 0 0 12px rgba(56,182,255,0.45) !important;
+        background: rgba(10,25,40,0.85) !important;
     }
     input {
-      color: #e8f4ff !important;
+        color: #e8f4ff !important;
+        font-size: 0.95rem !important;
     }
-    /* Botão Login */
     .stButton > button {
-      width: 100%;
-      background: linear-gradient(90deg,#00baff,#0078ff);
-      color: #00141e;
-      font-weight: 700;
-      font-size: 1.05rem;
-      border-radius: 10px;
-      border: none;
-      box-shadow: 0 0 18px rgba(0,180,255,0.35);
-      transition: all 0.25s ease;
-      height: 46px;
+        background: linear-gradient(90deg,#0078ff,#00bfff);
+        color: white;
+        font-weight: 700;
+        border-radius: 12px;
+        border: none;
+        padding: 6px 0;
+        width: 100%;
+        margin-top: 10px;
+        height: 40px;
+        box-shadow: 0 0 14px rgba(0,150,255,0.35);
+        transition: all 0.25s ease;
     }
     .stButton > button:hover {
-      box-shadow: 0 0 35px rgba(0,200,255,0.5);
-      transform: translateY(-1px);
+        box-shadow: 0 0 25px rgba(0,180,255,0.5);
+        transform: translateY(-1px);
     }
     </style>
     """, unsafe_allow_html=True)
 
-    # Cartão de login
-    with st.container():
-        st.markdown('<div class="login-card">', unsafe_allow_html=True)
-        st.markdown("<h1>AI Social Automator</h1>", unsafe_allow_html=True)
-        st.markdown("<p>Acede à tua conta para começar 🚀</p>", unsafe_allow_html=True)
+    # Caixa principal
+    st.markdown('<div class="login-box">', unsafe_allow_html=True)
+    st.markdown('<div class="login-title">AI Social Automator</div>', unsafe_allow_html=True)
+    st.markdown('<div class="login-sub">Acede à tua conta para começar 🚀</div>', unsafe_allow_html=True)
 
-        with st.form("login_form", clear_on_submit=False):
-            u = st.text_input("👤 Utilizador", placeholder="Insere o teu utilizador")
-            p = st.text_input("🔑 Palavra-passe", type="password", placeholder="Insere a tua palavra-passe")
-            ok = st.form_submit_button("✨ Entrar")
+    with st.form("login_form", clear_on_submit=False):
+        u = st.text_input("👤 Utilizador", placeholder="Insere o teu utilizador")
+        p = st.text_input("🔑 Palavra-passe", type="password", placeholder="Insere a tua palavra-passe")
+        ok = st.form_submit_button("Entrar")
 
-            if ok:
-                if u in users and users[u].get("password") == p:
-                    st.session_state.update({"logged_in": True, "username": u, "mode": "main"})
-                    st.success(f"Bem-vindo, {u} 👋")
-                    time.sleep(0.6)
-                    st.rerun()
-                else:
-                    st.error("❌ Credenciais incorretas.")
+        if ok:
+            if u in users and users[u].get("password") == p:
+                st.session_state.update({"logged_in": True, "username": u, "mode": "main"})
+                st.success(f"Bem-vindo, {u} 👋")
+                time.sleep(0.6)
+                st.rerun()
+            else:
+                st.error("❌ Credenciais incorretas.")
 
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 # -------------------- MAIN --------------------
 def main_page():
     user=st.session_state.get("username","")
