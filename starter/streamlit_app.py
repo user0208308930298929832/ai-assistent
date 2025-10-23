@@ -152,57 +152,45 @@ def gen_two_captions(theme,niche,tone):
         parts=[txt[:half].strip(),txt[half:].strip()]
     return parts[:2]
 
-# -------------------- LOGIN --------------------
-def login_screen():
+# -------------------- LOGIN --------------------def login_screen():
     users = load_users()
 
     st.markdown("""
     <style>
-    /* === Layout geral === */
     .login-box {
         background: rgba(255,255,255,0.04);
         border: 1px solid rgba(120,190,255,0.25);
-        border-radius: 16px;
-        padding: 28px 32px;
+        border-radius: 14px;
+        padding: 26px 28px;
         width: 100%;
-        max-width: 300px;
-        margin: 22vh auto 0 auto;
+        max-width: 280px;
+        margin: 25vh auto 0 auto;
         text-align: center;
-        box-shadow: 0 6px 18px rgba(0, 100, 255, 0.12);
+        box-shadow: 0 4px 16px rgba(0, 100, 255, 0.15);
         backdrop-filter: blur(10px);
     }
-
-    /* === Título e subtítulo === */
     .login-title {
         font-size: 1.6rem;
         font-weight: 800;
         color: #38b6ff;
-        text-shadow: 0 0 10px rgba(0,180,255,0.4);
+        text-shadow: 0 0 12px rgba(0,180,255,0.4);
         margin-bottom: 6px;
-        text-align: center;
     }
     .login-sub {
         color: #b9d6f2;
         font-size: 0.9rem;
         margin-bottom: 20px;
-        text-align: center;
     }
 
-    /* === Inputs === */
-    .stTextInput label {
-        font-weight: 600;
-        color: #9bd2ff !important;
-        font-size: 0.8rem !important;
-        text-align: center;
-        display: block;
-        margin-bottom: 4px;
-    }
+    /* Inputs */
+    .stTextInput label {display: none !important;}
     div[data-baseweb="input"] > div {
         border: 1px solid rgba(150,210,255,0.35) !important;
         border-radius: 10px !important;
         background: rgba(10,20,30,0.65) !important;
         transition: all 0.25s ease;
-        height: 34px !important;
+        height: 32px !important;
+        width: 100% !important;
     }
     div[data-baseweb="input"]:focus-within > div {
         border: 1px solid #38b6ff !important;
@@ -215,22 +203,22 @@ def login_screen():
         text-align: center !important;
     }
 
-    /* === Botão === */
+    /* Botão */
     .stButton > button {
         background: linear-gradient(90deg,#0078ff,#00bfff);
         color: white;
         font-weight: 700;
-        border-radius: 20px;
+        border-radius: 18px;
         border: none;
-        padding: 5px 0;
+        padding: 4px 0;
         width: 100%;
-        margin-top: 12px;
-        height: 34px;
-        box-shadow: 0 0 12px rgba(0,150,255,0.35);
+        margin-top: 10px;
+        height: 32px;
+        box-shadow: 0 0 10px rgba(0,150,255,0.3);
         transition: all 0.25s ease;
     }
     .stButton > button:hover {
-        box-shadow: 0 0 20px rgba(0,180,255,0.5);
+        box-shadow: 0 0 18px rgba(0,180,255,0.45);
         transform: translateY(-1px);
     }
     </style>
@@ -239,18 +227,18 @@ def login_screen():
     # Caixa principal
     st.markdown('<div class="login-box">', unsafe_allow_html=True)
     st.markdown('<div class="login-title">AI Social Automator</div>', unsafe_allow_html=True)
-    st.markdown('<div class="login-sub">Acede à tua conta para começar 🚀</div>', unsafe_allow_html=True)
+    st.markdown('<div class="login-sub">Acede à tua conta 🚀</div>', unsafe_allow_html=True)
 
     with st.form("login_form", clear_on_submit=False):
-        u = st.text_input("👤 Utilizador", placeholder="Utilizador")
-        p = st.text_input("🔑 Palavra-passe", type="password", placeholder="Palavra-passe")
+        u = st.text_input("", placeholder="Utilizador")
+        p = st.text_input("", type="password", placeholder="Palavra-passe")
         ok = st.form_submit_button("Entrar")
 
         if ok:
             if u in users and users[u].get("password") == p:
                 st.session_state.update({"logged_in": True, "username": u, "mode": "main"})
                 st.success(f"Bem-vindo, {u} 👋")
-                time.sleep(0.6)
+                time.sleep(0.5)
                 st.rerun()
             else:
                 st.error("❌ Credenciais incorretas.")
