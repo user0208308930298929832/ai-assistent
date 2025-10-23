@@ -5,17 +5,23 @@ from shared.utils import (
 )
 from datetime import datetime
 
-st.set_page_config(page_title="AI Social Automator — Starter", page_icon="🤖", layout="centered")
+# ---------------- CONFIG ----------------
+st.set_page_config(
+    page_title="AI Social Automator — Starter",
+    page_icon="🤖",
+    layout="centered"
+)
 inject_css()
 
-# ---------- Auth
+# ---------------- LOGIN ----------------
 if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
     login_card("AI Social Automator — Starter")
     st.stop()
-logout_pill()
-user = st.session_state.get("username","")
 
-# ---------- UI
+logout_pill()
+user = st.session_state.get("username", "")
+
+# ---------------- UI ----------------
 st.markdown('<div class="app-wrap">', unsafe_allow_html=True)
 st.markdown('<h1 class="title-xl">Cria conteúdo que converte — em segundos.</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtle">2 legendas por geração, hashtags inteligentes e hora ideal de publicação.</p>', unsafe_allow_html=True)
@@ -27,30 +33,34 @@ with col:
     theme = st.text_area("Tema do post", placeholder="Ex.: Nova coleção de outono, foco em elegância e conforto.")
     c1, c2 = st.columns(2)
     with c1:
-        niche = st.selectbox("Nicho", ["Geral","Moda","Fitness","Restaurantes","Beleza","Tecnologia"])
+        niche = st.selectbox("Nicho", ["Geral", "Moda", "Fitness", "Restaurantes", "Beleza", "Tecnologia"])
     with c2:
-        tone  = st.radio("Tom de voz", ["Neutro","Inspirador"], horizontal=True)
+        tone = st.radio("Tom de voz", ["Neutro", "Inspirador"], horizontal=True)
     short = st.toggle("Versão curta (≤ 200 caracteres)", value=False)
     go = st.button("⚡ Gerar", type="primary", use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 client = get_client()
 
+# ---------------- FUNÇÃO DE GERAÇÃO ----------------
 def gen_two(theme, niche, tone, short=False):
     sys = "És copywriter de social media. Responde em PT-PT. Máx 2 frases por legenda. Inclui 2–3 hashtags."
     limit = "Reduz a <=200 caracteres." if short else "Mantém natural, sem limite rígido."
     userp = f"Tema: {theme}\nNicho: {niche}\nTom: {tone}\nCria DUAS legendas curtas, distintas, com emojis e 2–3 hashtags.\n{limit}\nFormata como 1) ... 2) ..."
     r = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[{"role":"system","content":sys},{"role":"user","content":userp}],
-        temperature=0.7, max_tokens=260
+        messages=[{"role": "system", "content": sys}, {"role": "user", "content": userp}],
+        temperature=0.7,
+        max_tokens=260
     )
     text = r.choices[0].message.content.strip()
-    parts = [ln[2:].strip(": ").strip() for ln in text.splitlines() if ln[:2] in ("1)","2)")]
-    if len(parts)<2:
-        half=len(text)//2; parts=[text[:half].strip(), text[half:].strip()]
+    parts = [ln[2:].strip(": ").strip() for ln in text.splitlines() if ln[:2] in ("1)", "2)")]
+    if len(parts) < 2:
+        half = len(text)//2
+        parts = [text[:half].strip(), text[half:].strip()]
     return parts[:2]
 
+# ---------------- EXECUÇÃO ----------------
 if go:
     if not theme.strip():
         st.warning("Escreve o tema primeiro.")
@@ -82,6 +92,7 @@ if go:
         })
         st.success("Guardado no teu histórico.")
 
+# ---------------- HISTÓRICO ----------------
 st.markdown("### 📜 Histórico")
 hist = list(reversed(get_history(user)))
 if not hist:
